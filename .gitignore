@@ -91,3 +91,4 @@ sw.*
 
 # firebase
 .firebaserc
+firebaseConfig.json
