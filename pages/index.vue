@@ -5,6 +5,7 @@
         v-for="room in rooms"
         :key="room.id"
         class="bg-white max-w-sm rounded-lg overflow-hidden shadow m-4 mb-5 p-4 h-32"
+        @click="moveToRoomPage(room.id)"
       >
         <div>
           <img
@@ -69,6 +70,9 @@ export default {
   },
 
   methods: {
+    moveToRoomPage(roomId) {
+      this.$router.push(`/rooms/${roomId}`)
+    },
     openModal() {
       this.isCreateMode = true
     },
