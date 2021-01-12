@@ -1,6 +1,31 @@
 <template>
   <div class="relative">
-    <div class="px-4 pb-32"></div>
+    <div class="px-4 pb-32">
+      <div v-for="chat in chats" :key="chat.id">
+        <!-- 自分の発言の場合 -->
+        <template v-if="isMyChat(chat.userId)">
+          <div class="flex my-4 justify-end">
+            <div class="bg-iceblue rounded-tr-md rounded-l-md p-4 mt-1 w-72">
+              <pre class="whitespace-pre-wrap text-sm">{{ chat.body }}</pre>
+            </div>
+          </div>
+        </template>
+        <!-- 相手の発言の場合 -->
+        <template v-else>
+          <div class="flex my-4">
+            <div class="mr-2 mt-2 min-w-3">
+              <img :src="chat.iconImageUrl" class="rounded-full h-10 w-10" />
+            </div>
+            <div class="w-72">
+              <span class="text-xs">{{ chat.name }}</span>
+              <div class="bg-gray-300 rounded-bl-md rounded-r-md p-4">
+                <pre class="whitespace-pre-wrap text-sm">{{ chat.body }}</pre>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
     <form
       class="fixed bottom-0 bg-white w-full max-w-sm flex py-4 border-t border-gray-300"
       @submit.prevent="onSubmit"
@@ -23,8 +48,18 @@
 </template>
 
 <script>
+import { mapGetters, mapMutations } from 'vuex'
+
 export default {
   middleware: ['checkAuth'],
+
+  async asyncData({ store, params }) {
+    const roomId = params.id
+    const unsubscribe = await store.dispatch('chats/subscribe', { roomId })
+    return {
+      unsubscribe,
+    }
+  },
   data() {
     return {
       form: {
@@ -32,16 +67,31 @@ export default {
           val: null,
         },
       },
+      unsubscribe: null,
     }
   },
 
   computed: {
+    ...mapGetters('chats', ['chats']),
+
     isValidateError() {
       return !this.form.message.val
     },
   },
 
+  destroyed() {
+    this.$store.dispatch('chats/clear')
+    if (this.unsubscribe) this.unsubscribe()
+  },
+
   methods: {
+    ...mapMutations('alert', ['setMessage']),
+
+    isMyChat(userId) {
+      const { uid } = this.$fireAuth.currentUser
+      return userId === uid
+    },
+
     async onSubmit() {
       if (this.isValidateError) return
 
