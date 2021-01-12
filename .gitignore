@@ -90,5 +90,6 @@ sw.*
 *.swp
 
 # firebase
+.firebase/
 .firebaserc
 firebaseConfig.json
