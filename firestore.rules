@@ -20,10 +20,10 @@ service cloud.firestore {
               && request.resource.data[param].trim().size() != 0;
     }
 
-    // function isTimeStamp(param){
-    //   return require(param)
-    //         && request.resource.data[param] is timestamp
-    // }
+    function isTimeStamp(param){
+      return require(param)
+            && request.resource.data[param] is timestamp
+    }
 
     match /users/{userId} {
       allow get : if isAuth();
@@ -32,12 +32,12 @@ service cloud.firestore {
                     && isNotEmpty("iconImageUrl");
     }
 
-    // match /rooms/{roomId} {
-    //   allow read : if isAuth();
-    //   allow create: if isAuth()
-    //               && isNotEmpty("name")
-    //               && isNotEmpty("topImageUrl")
-    //               && isTimeStamp("createdAt");
+    match /rooms/{roomId} {
+      allow read : if isAuth();
+      allow create: if isAuth()
+                  && isNotEmpty("name")
+                  && isNotEmpty("topImageUrl")
+                  && isTimeStamp("createdAt");
 
     //   match /chats/{chatId} {
     //     allow read : if isAuth();
@@ -48,6 +48,6 @@ service cloud.firestore {
     //         && isNotEmpty("body")
     //         && isTimeStamp("createdAt");
     //   }
-    // }
+    }
   }
 }
